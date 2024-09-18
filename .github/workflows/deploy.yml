@@ -12,19 +12,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Install SSH Client
+       
+      - name: Node and npm versions
         run: |
-          sudo apt update
-          sudo apt install openssh-client -y
-
-      - name: Set up SSH agent
-        run: |
-          eval $(ssh-agent -s)
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo -e "${{ secrets.SSH_PRIVATE_KEY_DEVL }}" >> ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
+          node --version
+          npm --version
 
       - name: Install dependencies and build using npm
         run: "npm run deno-deploy"
