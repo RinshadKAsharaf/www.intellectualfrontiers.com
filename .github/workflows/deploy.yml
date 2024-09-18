@@ -33,6 +33,11 @@ jobs:
         run: |
           tar -czvf devl-intellectualfrontiers.tar.gz deno-deploy
 
+      - name: Check network connectivity
+        run: |
+          ping -c 4 ${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}
+          nc -zv ${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }} 422
+          
       - name: Copy build artifacts to the development server
         run: |
           scp -P422 -o StrictHostKeyChecking=no devl-intellectualfrontiers.tar.gz "${{ secrets.DEVELOPMENT_DEPLOYMENT_USER }}@${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}:"
