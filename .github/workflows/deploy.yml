@@ -31,11 +31,11 @@ jobs:
 
       - name: Archive build artifacts
         run: |
-          tar -czvf devl.intellectualfrontiers.tar.gz deno-deploy
+          tar -czvf devl-intellectualfrontiers.tar.gz deno-deploy
 
       - name: Copy build artifacts to the development server
         run: |
-          scp -P422 -o StrictHostKeyChecking=no devl.intellectualfrontiers.tar.gz "${{ secrets.DEVELOPMENT_DEPLOYMENT_USER }}@${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}:"
+          scp -P422 -o StrictHostKeyChecking=no devl-intellectualfrontiers.tar.gz "${{ secrets.DEVELOPMENT_DEPLOYMENT_USER }}@${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}:"
 
       - name: Deploy to development server
         run: |
