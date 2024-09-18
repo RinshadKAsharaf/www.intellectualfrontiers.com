@@ -35,7 +35,7 @@ jobs:
 
       - name: Copy build artifacts to the development server
         run: |
-          scp -p422 -o StrictHostKeyChecking=no devl.intellectualfrontiers.tar.gz "${{ secrets.DEVELOPMENT_DEPLOYMENT_USER }}@${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}:"
+          scp -P422 -o StrictHostKeyChecking=no devl.intellectualfrontiers.tar.gz "${{ secrets.DEVELOPMENT_DEPLOYMENT_USER }}@${{ secrets.DEVELOPMENT_DEPLOYMENT_SERVER_IP }}:"
 
       - name: Deploy to development server
         run: |
