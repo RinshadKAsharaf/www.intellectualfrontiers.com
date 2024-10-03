@@ -13,8 +13,8 @@ metadata:
     template: '%s | IntellectualFrontiers'
   description: "Shahid Shah's Intellectual Property Holdings"
   robots:
-    index: true
-    follow: true
+    index: false
+    follow: false
   openGraph:
     site_name: IntellectualFrontiers
     images:

@@ -1,22 +1,3 @@
 User-agent: *
 
-Disallow: /admin/
-Disallow: /cgi-bin/
-Disallow: /tmp/
-Disallow: /blog/
-Disallow: /click-through
-Disallow: /homes/mobile-app
-Disallow: /homes/personal
-Disallow: /homes/saas
-Disallow: /homes/startup
-Disallow: /landing/click-through
-Disallow: /landing/lead-generation
-Disallow: /landing/pre-launch
-Disallow: /landing/product
-Disallow: /landing/subscription
-Disallow: /pricing
-Disallow: /resources
-Disallow: /services
-Disallow: /sales
-
-Sitemap: https://www.intellectualfrontiers.com/sitemap.xml
+Disallow: /
