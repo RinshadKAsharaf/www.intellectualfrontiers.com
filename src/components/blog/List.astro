@@ -12,8 +12,28 @@ const { posts } = Astro.props;
 <ul>
   {
     posts.map((post) => (
-      <li class="mb-12 md:mb-20">
+    <li class="mb-12 md:mb-5 border postlist mb-6 shadow-2xl rounded overflow-hidden" >
+        <div class="p-3 border-b-2 flex items-center justify-between cursor-pointer" id={post.id}>
+          
+          
+          <button class="hover:text-primary dark:hover:text-blue-700 transition ease-in duration-200">
+         <span class="text-white">{post.patentId}</span>
+         
+        </button> 
+        {/* <Icon name="tabler:triangle-inverted-filled" class="w-3.5 h-3.5 inline-block -mt-0.5 dark:text-gray-400" /> */}
+        <div class="showhidepatent flex">
+          <span class="hideshow" title="Collapse Patent Family">
+          <span title="Collapse Patent Family"></span>
+         
+          </span>
+          <span class="showpatent">
+            <span class="plussign" title="Show Patent Family"></span>
+          </span>
+        </div>
+       
+        </div>
         <Item post={post} />
+        
       </li>
     ))
   }

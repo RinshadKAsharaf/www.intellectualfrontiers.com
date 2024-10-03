@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/PageLayout.astro';
-import BlogList from '../../components/blog/List.astro';
+import BlogList from '../../components/blog/ListPatent.astro';
 import Headline from '../../components/blog/Headline.astro';
 import Pagination from '../../components/blog/Pagination.astro';
 // import PostTags from "~/components/blog /Tags.astro";
 
 import { blogListRobots, getStaticPathsPatentList } from '../../utils/patent';
+import { fetchPatentPosts } from '../../utils/article';
 
 export const prerender = true;
 
@@ -13,7 +14,7 @@ export async function getStaticPaths({ paginate }) {
   return await getStaticPathsPatentList({ paginate });
 }
 
-//console.log('-patent---',Astro.props)
+const patentPosts = await fetchPatentPosts();
 
 const { page, totalPages } = Astro.props;
 //console.log(88888,page)
@@ -54,8 +55,8 @@ const metadata = {
     >
       Intellectual Frontiers lists patented inventions for sale or license
     </Headline>
-    <BlogList posts={page.data} />
-    <Pagination page={page} />
+    <BlogList posts={patentPosts} />
+    <!-- <Pagination page={page} /> -->
     <!--
       <PostTags tags={allCategories} class="mb-2" title="Search by Categories:" isCategory />
       <PostTags tags={allTags}  title="Search by Tags:" />

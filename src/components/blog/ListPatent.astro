@@ -1,0 +1,326 @@
+---
+import Item from '~/components/blog/ListItem.astro';
+import type { Post } from '~/types';
+import { patentFamilies } from '../../../support/patentFamilyMappings';
+import { Icon } from 'astro-icon/components';
+import Image from '~/components/common/Image.astro';
+import { getFormattedDate } from '~/utils/utils';
+import PostTags from '~/components/blog/Tags.astro';
+
+export interface Props {
+  posts: Array<Post>;
+}
+
+const { posts } = Astro.props;
+
+
+// Step 2: Create a set of primary patents
+const primaryPatents = new Set(
+  patentFamilies.map((family) => family[0]) // Use the first patent in each group as the primary
+);
+
+const patentMap = posts.reduce((map, post) => {
+  map[post.patentId] = {
+    title: post.title,
+    url: post.slug,
+    image: post.image,
+    publishedDate: post.publishDate,
+    excerpt: post.excerpt,
+    inventor: post.inventor,
+    patentId: post.patentId,
+    patentStatus: post.patentStatus,
+    category: post.category,
+    tags: post.tags,
+   
+  };
+  return map;
+}, {});
+
+
+// Step 4: Function to get family members for the primary patent
+const getFamilyMembers = (patentId) => {
+  const familyGroup = patentFamilies.find((group) => group.includes(patentId));
+  if (!familyGroup) return [];
+  return familyGroup.map((id) => patentMap[id]).filter(Boolean); // Fetch family members from the map
+};
+
+// Step 5: Filter posts to only include primary patents
+// This is required to display/create unique
+const filteredPosts = posts.filter((post) => primaryPatents.has(post.patentId));
+
+
+
+filteredPosts.map((post) => {
+  // Get family members only for the primary patent
+  const familyMembers = getFamilyMembers(post.patentId);
+
+
+  // console.log('----------------');
+  // console.log(post.patentId);
+  // console.log(familyMembers);
+  // return (
+  //   <li class="mb-12 md:mb-20">
+  //     <Item post={post} familyMembers={familyMembers} />
+  //   </li>
+  // );
+});
+---
+<style>
+  .hideshowpatentfamily{display: none !important;}
+  .hideshow span{width: 20px; display: block;     color: #fff;}
+  .hideshow span{width: 10px; display: block;     height: 3px;
+    background: #FFF;}
+    .hideshow{width: 25px; height: 25px; border: 1px solid; display: grid; place-items: center; border-radius: 50%;     color: #fff;}
+    .postlistbg:nth-child(2n+1){background-color: #f1f1f1;}
+    .postlist>div{background-color: #214ea2; }
+    .plussign{position: relative; display: grid;
+      place-items: center;}
+
+    .plussign::after{content: ""; position: absolute; width: 10px; height: 3px; background: #FFF}
+    .showpatent{width: 25px; height: 25px; border: 1px solid; display: grid; place-items: center; border-radius: 50%;     color: #fff; display: none}
+    .showpatents{display: none;}
+    .plussign::before{content: ""; position: absolute; width: 3px; height: 10px; left: 0; background: #FFF; transform: translateX(-50%)}
+    .showhidebutton .showpatent{display: grid;}
+    .showhidebutton .showpatents{display: flex;}
+    .showhidebutton .hideshow{display: none !important;}
+    .showhidebutton .hideshows{display: none !important;}
+    li{list-style: none;}
+</style>
+<div class="w-full text-right mb-4">
+  <button class="btn" id="hideshowunique">Show Unique Families</button>
+</div>
+{filteredPosts.map((post, index) => {
+  const familyMembers = getFamilyMembers(post.patentId);
+  const familyMembersToDisplay = familyMembers.slice(1);
+  return (
+    
+    <div class="postlistbg">
+     
+     
+      {/* Main Patent Article */}
+      <li class="mb-12 md:mb-5 border postlist mb-6 shadow-2xl rounded overflow-hidden">
+        <div class="p-3 border-b-2 flex items-center justify-between cursor-pointer" id={post.id}>
+          <button class="hover:text-primary dark:hover:text-blue-700 transition ease-in duration-200">
+         {/* <span class="text-white">{post.patentId}</span> */}
+         
+        </button> 
+        {/* <Icon name="tabler:triangle-inverted-filled" class="w-3.5 h-3.5 inline-block -mt-0.5 dark:text-gray-400" /> */}
+        <div class="showhidepatent flex">
+          <div class="hideshows flex">
+            <p class="text-white mx-3">Collapse Family Members</p>
+          <span class="hideshow" title="Collapse Patent Family">
+           
+          <span title="Collapse Patent Family"></span>
+         
+          </span>
+          </div>
+          <div class="showpatents flex">
+            <p class="text-white mx-3">Show Patent Family</p>
+          <span class="showpatent">
+            <span class="plussign" title="Show Patent Family"></span>
+          </span>
+        </div>
+        </div>
+      </div>
+        <article class={`border-1 max-w-md mx-auto md:max-w-none grid gap-6 md:gap-8 p-6 ${post.image ? 'md:grid-cols-2' : ''}`}>
+          {post.image && (
+            <a class="relative block group" href={post.url ?? 'javascript:void(0)'}>
+              <div class="relative pb-[56.25%] md:pb-[75%] lg:pb-[56.25%] overflow-hidden bg-gray-400 dark:bg-slate-700 rounded shadow-lg h-full" style="border: 1px solid #214ea2;">
+                <Image
+                  src={post.image}
+                  class="absolute inset-0 !object-top w-full h-full mb-6 rounded shadow-lg bg-white px-4 pt-4"
+                  widths={[400, 900]}
+                  width={900}
+                  sizes="(max-width: 900px) 400px, 900px"
+                  alt={post.title}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </a>
+          )}
+          <div class="mt-0">
+            <header>
+              <span class="text-sm">
+              <div class="mb-1">
+                
+                <Icon name="tabler:calendar-month" class="w-3.5 h-3.5 inline-block -mt-0.5 dark:text-gray-400" />
+                <time datetime={String(post.publishDate)} class="inline-block font-medium"> Publication Date: {getFormattedDate(post.publishDate)}</time>
+                {post.category && (
+                 <>
+                  {' '}
+                  ·{' '}
+                  <a class="capitalize hover:underline" href="/patents">
+                    {post.category.replaceAll('-', ' ')}
+                  </a>
+                </>
+                )}
+               
+              </div>
+              {post.patentId && (
+                <>
+                  <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{post.patentId}</span></>
+                )}
+                {post.patentStatus && (
+                <>
+                  <span class="uppercase bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">{post.patentStatus}</span></>
+                )}
+                </span>
+              <h2 class="text-xl sm:text-2xl font-bold leading-tight mb-2 font-heading dark:text-slate-300">
+                <a class="hover:text-primary dark:hover:text-blue-700 transition ease-in duration-200" href={post.url}>
+                  {post.title}
+                </a>
+              </h2>
+              {post.excerpt && <p class="flex-grow text-muted dark:text-slate-400 text-lg mb-3">{post.excerpt}</p>}
+            </header>
+            {post.inventor && (
+              <>
+                <span class="font-medium">Inventor:</span>
+                <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{post.inventor}</span>
+              </>
+            )}
+             <>
+                <span class="font-medium">Inventor:</span>
+                <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Shahid N. Shah</span>
+              </>
+           
+            <footer class="mt-5">
+              <PostTags tags={post.tags} />
+            </footer>
+          </div>
+        </article>
+        {/* Family Members as Main Patent Articles */}
+      {familyMembersToDisplay.length > 0 && (
+        familyMembersToDisplay.map((member, idx) => (
+         
+            <article class={`articllefamily max-w-md mx-auto md:max-w-none grid gap-6 md:gap-8 mt-6 p-6 border-t-2 ${member.image ? 'md:grid-cols-2' : ''}`}>
+              {member.image && (
+                <a class="relative block group" href={member.url ?? 'javascript:void(0)'}>
+                  <div class="relative pb-[56.25%] md:pb-[75%] lg:pb-[56.25%] overflow-hidden bg-gray-400 dark:bg-slate-700 rounded shadow-lg h-full" style="border: 1px solid #214ea2;">
+                    <Image
+                      src={member.image}
+                      class="absolute inset-0 !object-top w-full h-full mb-6 rounded shadow-lg bg-white px-4 pt-4"
+                      widths={[400, 900]}
+                      width={900}
+                      sizes="(max-width: 900px) 400px, 900px"
+                      alt={member.title}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                </a>
+              )}
+              <div class="mt-0">
+                <header>
+                  <span class="text-sm">
+                  <div class="mb-1">
+                    <Icon name="tabler:calendar-month" class="w-3.5 h-3.5 inline-block -mt-0.5 dark:text-gray-400" />
+                    <time datetime={String(member.publishedDate)} class="inline-block font-medium">Publication Date: {getFormattedDate(member.publishedDate)}</time>
+                    {member.category && (
+                      <span> · <a class="capitalize hover:underline" href="/patents">{member.category.replaceAll('-', ' ')}</a></span>
+                    )}
+                   
+                  </div>
+                  {member.patentId && (
+                      <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{member.patentId}</span>
+                    )}
+                    {member.patentStatus && (
+                      <span class="uppercase bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">{member.patentStatus}</span>
+                    )}
+                    </span>
+                  <h2 class="text-xl sm:text-2xl font-bold leading-tight mb-2 font-heading dark:text-slate-300">
+                    <a class="hover:text-primary dark:hover:text-blue-700 transition ease-in duration-200" href={member.url}>
+                      {member.title}
+                    </a>
+                  </h2>
+                  {member.excerpt && <p class="flex-grow text-muted dark:text-slate-400 text-lg mb-3">{member.excerpt}</p>}
+                </header>
+                {member.inventor && (
+                  <>
+                    <span class="font-medium">Inventor: </span>
+                    <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{member.inventor}</span>
+                  </>
+                )}
+                   <>
+                <span class="font-medium">Inventor: </span>
+                <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Shahid N. Shah</span>
+              </>
+                <footer class="mt-5">
+                  <PostTags tags={member.tags} />
+                </footer>
+              </div>
+            </article>
+       
+        ))
+      )}
+      </li>
+
+      
+    </div>
+  );
+})}
+
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.question-btn');
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-toggle');
+        const target = document.getElementById(targetId);
+        const isExpanded = target.style.display === 'block';
+
+        if (isExpanded) {
+          target.style.display = 'none';
+          this.querySelector('svg').classList.remove('rotate-180');
+        } else {
+          target.style.display = 'block';
+          this.querySelector('svg').classList.add('rotate-180');
+        }
+      });
+    });
+  });
+</script>
+<script>
+
+var listcollapse = document.getElementsByClassName('postlist');
+
+
+for (var i = 0; i < listcollapse.length; i++) {
+  listcollapse[i].addEventListener('click', function() {
+    // Get all elements with the class 'articllefamily' within the clicked element
+    let addclass = this.querySelectorAll('.articllefamily');
+    // Get all elements with the class 'showhidepatent' within the clicked element
+    let addclassli = this.querySelectorAll('.showhidepatent');
+    
+    // Toggle class for each 'articllefamily' element
+    addclass.forEach(function(el) {
+      el.classList.toggle('hideshowpatentfamily');
+    });
+    
+    // Toggle class for each 'showhidepatent' element
+    addclassli.forEach(function(el) {
+      el.classList.toggle('showhidebutton');
+    });
+  });
+}
+
+var hideshowunique = document.getElementById('hideshowunique');
+hideshowunique.addEventListener('click', function(){
+  var addClassForAll = document.querySelectorAll('.articllefamily');
+  addClassForAll.forEach(function(clAll) {
+    clAll.classList.add('hideshowpatentfamily');
+  });
+  
+ // Select all elements with the class 'showhidepatent' (anywhere in the DOM) and add 'showhidebutton'
+ let addclassli = document.querySelectorAll('.showhidepatent');
+  addclassli.forEach(function(el) {
+    el.classList.add('showhidebutton');
+  });
+});
+</script>
